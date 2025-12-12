@@ -1,3 +1,39 @@
+# ====================================================================================================
+# PATHWAY ACTIVITY COMPARISON ANALYSIS - MANUSCRIPT FIGURES 6B AND 6C
+# ====================================================================================================
+#
+# PURPOSE:
+# This script calculates pathway activity scores across T cell subtypes and compares treatment cohorts
+# to generate Figures 6b and 6c for the manuscript. Pathway activity is defined as the mean expression
+# of all genes within a specific pathway, representing the overall functional state of that pathway
+# in different cell populations.
+#
+# BIOLOGICAL RATIONALE:
+# Pathway activity scores provide a robust measure of cellular functional state by aggregating
+# expression across multiple genes in a biological pathway. This approach:
+# 1. Reduces noise compared to single-gene analysis
+# 2. Captures coordinated biological processes (e.g., immune activation, T cell response)
+# 3. Enables comparison of functional states between treatment cohorts (MK-3475 Alone vs MK-3475 + MLA)
+# 4. Reveals temporal dynamics of immune pathway activation across treatment timepoints
+#
+# KEY METHODOLOGY:
+# - Pathway Activity: Mean expression of all genes in pathway (from GMT file)
+# - Cluster Proportion Weighting: Adjusts pathway signal by the frequency of cell subtype
+# - Signal Change Metrics:
+#   * Ratio method: (Activity at timepoint B) / (Activity at timepoint A)
+#   * Difference method: (Activity at timepoint B) - (Activity at timepoint A)
+# - Statistical Testing: Wilcoxon rank-sum test comparing cohorts at each timepoint pair
+#
+# MANUSCRIPT FIGURES GENERATED:
+# - Figure 6b: Pathway activity changes across timepoints for different T cell subtypes
+# - Figure 6c: Statistical comparison of pathway activity between treatment cohorts
+#
+# SCRIPT STRUCTURE:
+# - SECTION 1 (Lines 1-426): Original implementation with basic functions and analysis
+# - SECTION 2 (Lines 432-862): Refactored implementation with enhanced plotting and significance symbols
+#
+# ====================================================================================================
+
 library(dplyr)
 library(tidyr)
 library(ggplot2)
@@ -5,8 +41,40 @@ library(Seurat)
 library(cowplot)
 
 
-# ==================================================================================================================================================================
-# cluster proportion change comparison
+# ====================================================================================================
+# SECTION 1: ORIGINAL IMPLEMENTATION - PATHWAY ACTIVITY CALCULATION AND COHORT COMPARISON
+# ====================================================================================================
+# This section contains the initial implementation analyzing 10 immune pathways across 13 T cell
+# subtypes, comparing MK-3475 Alone vs MK-3475 + MLA cohorts across multiple timepoints.
+# ====================================================================================================
+
+# ----------------------------------------------------------------------------------------------------
+# FUNCTION: create_survival_data
+# ----------------------------------------------------------------------------------------------------
+# PURPOSE:
+# Calculate pathway activity scores for each patient at multiple timepoints by computing the mean
+# expression of all genes within a specified pathway.
+#
+# PARAMETERS:
+# @param gmt_file: Path to GMT file containing pathway gene sets
+# @param pathway_name: Name of the specific pathway to analyze (e.g., "GO_T_CELL_ACTIVATION")
+# @param seurat_obj: Seurat object containing normalized single-cell RNA-seq data
+# @param survival_data: Path to CSV file with patient clinical and survival data
+#
+# RETURNS:
+# Data frame with patient IDs and mean pathway expression at each timepoint (Mean_Expr_Pre, etc.)
+#
+# METHODOLOGY:
+# 1. Extract pathway gene list from GMT file
+# 2. For each patient and timepoint:
+#    - Subset cells belonging to that patient
+#    - Calculate mean expression of pathway genes across those cells (pathway activity score)
+# 3. Pathway activity = average normalized expression of all genes in the pathway
+#
+# BIOLOGICAL INTERPRETATION:
+# Higher pathway activity indicates increased expression of genes in that pathway, suggesting
+# enhanced functional activity (e.g., higher T cell activation pathway activity = more activated cells)
+# ----------------------------------------------------------------------------------------------------
 create_survival_data <- function(gmt_file, pathway_name, seurat_obj, survival_data) {
   # Read GMT file and extract genes for the specified pathway
   gmt <- readLines(gmt_file)
@@ -116,8 +184,36 @@ create_survival_data <- function(gmt_file, pathway_name, seurat_obj, survival_da
 
 
 
+# ----------------------------------------------------------------------------------------------------
+# FUNCTION: get_cluster_proportion
+# ----------------------------------------------------------------------------------------------------
+# PURPOSE:
+# Calculate the proportion of cells belonging to specific clusters for each patient at a given timepoint.
+# This proportion is used to weight pathway activity scores, accounting for the relative abundance
+# of specific T cell subtypes in each patient's sample.
+#
+# PARAMETERS:
+# @param seurat_metadata: Metadata from Seurat object containing cell-level information
+# @param patient_col: Column name containing patient/donor identifiers
+# @param timepoint_col: Column name containing timepoint information
+# @param cluster_col: Column name containing cluster assignments
+# @param clusters_of_interest: Vector of cluster IDs to include in proportion calculation
+# @param timepoint_of_interest: Specific timepoint to analyze (e.g., "Pre", "C1", "C2")
+#
+# RETURNS:
+# Data frame with patient_id and Cluster_Proportion_X (where X is the timepoint)
+#
+# METHODOLOGY:
+# Cluster proportion = (# cells in specified clusters) / (# total cells at timepoint)
+# This weighting accounts for inter-patient variability in cell subset frequencies
+#
+# BIOLOGICAL RATIONALE:
+# Different patients may have varying proportions of specific T cell subtypes. By weighting
+# pathway activity by cluster proportion, we account for this heterogeneity and calculate
+# a more accurate representation of overall pathway signal contribution.
+# ----------------------------------------------------------------------------------------------------
 get_cluster_proportion <- function(seurat_metadata, patient_col, timepoint_col, cluster_col, clusters_of_interest, timepoint_of_interest) {
-  # Filter metadata for the cluster of interest and the specified timepoint
+  # Filter metadata for clusters of interest and specified timepoint
   cluster_timepoint_data <- seurat_metadata[seurat_metadata[[cluster_col]] %in% clusters_of_interest & seurat_metadata[[timepoint_col]] == timepoint_of_interest, ]
   timepoint_data <- seurat_metadata[seurat_metadata[[timepoint_col]] == timepoint_of_interest, ]
   # Group the filtered data by patient
@@ -158,8 +254,15 @@ get_cluster_proportion <- function(seurat_metadata, patient_col, timepoint_col, 
 
 
 
-# =============================================================================================================================================================================================
-# For subpopulations of T Cells only (cluster proportion in T cells)
+# ====================================================================================================
+# MAIN ANALYSIS LOOP: PATHWAY ACTIVITY COMPARISON ACROSS T CELL SUBTYPES
+# ====================================================================================================
+# This section analyzes 10 immune pathways across 13 different T cell subtypes, comparing pathway
+# activity between MK-3475 Alone and MK-3475 + MLA treatment cohorts at multiple timepoints.
+# The analysis generates visualizations showing temporal pathway dynamics and statistical comparisons.
+# ====================================================================================================
+
+# Load T cell Seurat object (contains pre-clustered T cell populations)
 
 seurat_object_t_cells <- readRDS("/project/dtran642_927/Data/Collaborator/DJ/scRNAseq/latest_big_sequencing_projects/MK/new_sequencing_data/nextflow_pipeline/Aggregated/outs/NETZEN_analysis/clustering_res_1/MK_T_Cells_seurat_obj.RDS")
 seurat_metadata_t_cells <- seurat_object_t_cells@meta.data
@@ -173,14 +276,24 @@ patient_col <- "Patient"
 timepoint_col <- "TimePoint"
 cluster_col <- "seurat_clusters"
 
-include_cluster_proportion <- TRUE
+# ANALYSIS PARAMETERS
+include_cluster_proportion <- TRUE  # Weight pathway activity by cluster proportion
 gmt_file <- "/project/dtran642_927/SonLe/USC_Source/source/NetZenPathwayAnalysis/subsubset_output.gmt"
 
+# Define 10 immune-related pathways to analyze
 pathways <- c("GO_ADAPTIVE_IMMUNE_RESPONSE", "GO_T_CELL_ACTIVATION", "GO_REGULATION_OF_IMMUNE_RESPONSE", "GO_POSITIVE_REGULATION_OF_IMMUNE_RESPONSE", "GO_POSITIVE_REGULATION_OF_IMMUNE_SYSTEM_PROCESS", "REACTOME_IMMUNE_SYSTEM", "GO_IMMUNE_RESPONSE-ACTIVATING_SIGNALING_PATHWAY", "GO_ACTIVATION_OF_IMMUNE_RESPONSE", "GO_REGULATION_OF_T_CELL_ACTIVATION", "GO_T_CELL_ACTIVATION_INVOLVED_IN_IMMUNE_RESPONSE")
 
+# Signal change calculation method
+# "ratio": Calculate fold-change (Activity_B / Activity_A) - preferred for multiplicative effects
+# "difference": Calculate absolute change (Activity_B - Activity_A) - preferred for additive effects
 method = "ratio"
 
-# Define the mapping
+# ----------------------------------------------------------------------------------------------------
+# T CELL SUBTYPE DEFINITIONS
+# ----------------------------------------------------------------------------------------------------
+# Map 13 biological T cell subtypes to their corresponding Seurat cluster IDs
+# This mapping enables analysis of pathway activity in functionally distinct T cell populations
+# ----------------------------------------------------------------------------------------------------
 mapping <- list(
   "Activated_CD4" = c(0),
   "Effector_CD8" = c(1),
@@ -214,16 +327,30 @@ fc_list <- c()
 logfc_list <- c()
 pvalue_list <- c()
 
+# ----------------------------------------------------------------------------------------------------
+# NESTED LOOP: ITERATE THROUGH PATHWAYS AND CELL TYPES
+# ----------------------------------------------------------------------------------------------------
+# For each pathway-celltype combination, calculate pathway activity at multiple timepoints,
+# compare cohorts, perform statistical testing, and generate visualizations
+# ----------------------------------------------------------------------------------------------------
 for (pathway in pathways){
   for (celltype in unique(celltype_to_cluster$celltype)){
     print(celltype)
     cluster_list <- as.vector(celltype_to_cluster[celltype_to_cluster$celltype == celltype, "cluster"])
+    
+    # Subset Seurat object to specific T cell subtype clusters
     seurat_object_t_cell_subset <- subset(seurat_object_t_cells, subset = seurat_clusters %in% cluster_list)
+    
+    # Normalize data using Relative Counts (RC) method scaled to 1 million
+    # This ensures comparable expression values across cells
     seurat_object_t_cell_subset <- NormalizeData(seurat_object_t_cell_subset, normalization.method = "RC", scale.factor = 1e6, verbose = TRUE, assay = "RNA")
     tcell_cluster_list <- cluster_list
     seurat_metadata <- seurat_metadata_t_cells
     
+    # Calculate pathway activity (mean expression of pathway genes) for each patient and timepoint
     updated_survival_df <- create_survival_data(gmt_file, pathway, seurat_object_t_cell_subset, survival_data)
+    
+    # Exclude IDH-positive patients (these have different biology and are analyzed separately)
     updated_survival_df <- updated_survival_df[updated_survival_df$IDH != "POS",]
     print(updated_survival_df)
     
@@ -237,15 +364,29 @@ for (pathway in pathways){
       timepoint_b <- timepoint_pair[2]
       
       if (include_cluster_proportion) {
+        # Calculate cluster proportions for both timepoints
         timepoint_a_cluster_proportion_df <- get_cluster_proportion(seurat_metadata, patient_col, timepoint_col, cluster_col, tcell_cluster_list, timepoint_a)
         timepoint_b_cluster_proportion_df <- get_cluster_proportion(seurat_metadata, patient_col, timepoint_col, cluster_col, tcell_cluster_list, timepoint_b)
+        
+        # Merge cluster proportion data with survival data
         temp_survival_df <- merge(temp_survival_df, timepoint_a_cluster_proportion_df, by = "patient_id")
         temp_survival_df <- merge(temp_survival_df, timepoint_b_cluster_proportion_df, by = "patient_id")
+        
+        # CLUSTER PROPORTION WEIGHTING:
+        # Weight pathway activity by the proportion of cells in this subtype
+        # Pathway Signal = (Mean pathway expression) × (Proportion of cells in this cluster)
+        # This accounts for cell subset frequency variations across patients
         temp_survival_df[paste0("Pathway_Signal_", timepoint_a)] <- temp_survival_df[, paste0("Mean_Expr_", timepoint_a)] * temp_survival_df[, paste0("Cluster_Proportion_", timepoint_a)]
         temp_survival_df[paste0("Pathway_Signal_", timepoint_b)] <- temp_survival_df[, paste0("Mean_Expr_", timepoint_b)] * temp_survival_df[, paste0("Cluster_Proportion_", timepoint_b)]
+        # SIGNAL CHANGE CALCULATION:
+        # Quantify how pathway activity changes between timepoint A and timepoint B
         if (method == "difference") {
+          # Difference method: Absolute change in pathway signal
+          # Positive = increased activity; Negative = decreased activity
           temp_survival_df[, "signal_change"] <- (temp_survival_df[paste0("Pathway_Signal_", timepoint_b)]) - (temp_survival_df[paste0("Pathway_Signal_", timepoint_a)])
         } else if (method == "ratio") {
+          # Ratio method: Fold-change in pathway signal
+          # >1 = increased activity; <1 = decreased activity; 1 = no change
           temp_survival_df[, "signal_change"] <- (temp_survival_df[paste0("Pathway_Signal_", timepoint_b)]) / (temp_survival_df[paste0("Pathway_Signal_", timepoint_a)])
         }
       } else {
@@ -260,11 +401,15 @@ for (pathway in pathways){
       print(temp_survival_df[, "signal_change"])
       
       merged_proportion_df <- temp_survival_df
+      # COHORT COMPARISON SETUP:
+      # Compare two treatment arms: MK-3475 alone (monotherapy) vs MK-3475 + MLA (combination therapy)
       merged_proportion_df$Arm <- factor(merged_proportion_df$Arm, levels = c("MK-3475 Alone", "MK-3475 + MLA"))
-      # Define custom colors
+      
+      # Define custom colors for visualization
       custom_colors <- c("MK-3475 + MLA" = "red", "MK-3475 Alone" = "blue")
       
-      
+      # STATISTICAL TESTING:
+      # Perform Wilcoxon rank-sum test only if both cohorts have sufficient samples (n >= 2)
       if (all(c("MK-3475 Alone", "MK-3475 + MLA") %in% unique(merged_proportion_df$Arm)) &&
           sum(merged_proportion_df$Arm == "MK-3475 Alone") >= 2 &&
           sum(merged_proportion_df$Arm == "MK-3475 + MLA") >= 2) {
@@ -308,7 +453,10 @@ for (pathway in pathways){
         }
         
         
-        # Perform Wilcoxon test
+        # WILCOXON RANK-SUM TEST:
+        # Non-parametric test comparing signal_change distributions between treatment cohorts
+        # Null hypothesis: No difference in pathway activity change between cohorts
+        # Tests whether one cohort shows significantly different pathway dynamics
         p_value <- tryCatch({
           test_result <- wilcox.test(signal_change ~ Arm, data = merged_proportion_df)
           test_result$p.value
@@ -384,7 +532,8 @@ for (pathway in pathways){
       plot_list_2[[paste(timepoint_a, timepoint_b, sep = "_vs_")]] <- p
     }
     
-    # Combine all patient plots into a grid
+    # *** MANUSCRIPT FIGURE GENERATION (FIGURE 6B AND 6C) ***
+    # Combine line plots (temporal dynamics) and boxplots (cohort comparisons) into grid
     plot_list <- c(plot_list_1, plot_list_2)
     final_plot <- plot_grid(plotlist = plot_list, ncol = length(pairs_list), align = 'v')
     
@@ -429,7 +578,19 @@ write.csv(df, file_name)
 
 
 
-########################################################################################################################################################################################
+# ====================================================================================================
+# SECTION 2: REFACTORED IMPLEMENTATION WITH ENHANCED VISUALIZATION
+# ====================================================================================================
+# This section contains an improved version of the analysis with:
+# - Better code organization using dplyr/tidyverse syntax
+# - Addition of significance symbols (*, **, ***) based on p-values
+# - Improved plot aesthetics (removed x-axis labels, legends for clarity)
+# - More robust error handling
+#
+# The core methodology remains identical to Section 1, calculating pathway activity scores,
+# weighting by cluster proportions, and comparing treatment cohorts using Wilcoxon tests.
+# ====================================================================================================
+
 # Load Required Libraries
 library(dplyr)
 library(tidyr)
@@ -437,9 +598,26 @@ library(ggplot2)
 library(Seurat)
 library(cowplot)
 
-# ==================================================================================================================================================================
-# Helper Function to Determine Significance Based on p-value
-
+# ----------------------------------------------------------------------------------------------------
+# FUNCTION: get_significance
+# ----------------------------------------------------------------------------------------------------
+# PURPOSE:
+# Convert p-values to standard significance symbols for publication-ready figures
+#
+# PARAMETERS:
+# @param p: Numeric p-value from statistical test
+#
+# RETURNS:
+# Character string with significance symbol:
+#   "***" for p < 0.001 (highly significant)
+#   "**"  for p < 0.01  (very significant)
+#   "*"   for p < 0.05  (significant)
+#   "ns"  for p >= 0.05 (not significant)
+#
+# USAGE:
+# This function standardizes significance reporting across all comparisons and ensures
+# consistent interpretation of statistical results in figures
+# ----------------------------------------------------------------------------------------------------
 get_significance <- function(p) {
   if (is.na(p)) {
     return("ns")
@@ -774,8 +952,10 @@ for (pathway in pathways) {
       plot_list_2[[paste(timepoint_a, timepoint_b, sep = "_vs_")]] <- p_box
     }
     
-    # ==================================================================================================================================================================
-    # Combine All Plots into a Grid
+    # -----------------------------------------------------------------------------------------------
+    # *** MANUSCRIPT FIGURE GENERATION (FIGURE 6B AND 6C) ***
+    # Combine all plots (line plots + boxplots) into publication-ready grid layout
+    # -----------------------------------------------------------------------------------------------
     plot_list <- c(plot_list_1, plot_list_2)
     final_plot <- plot_grid(
       plotlist = plot_list,
@@ -817,8 +997,12 @@ for (pathway in pathways) {
   }
 }
 
-# ==================================================================================================================================================================
-# Create and Save the Comparison Results Data Frame with Significance
+# ====================================================================================================
+# EXPORT STATISTICAL RESULTS
+# ====================================================================================================
+# Save comprehensive statistical comparison results including pathway, celltype, timepoint comparison,
+# fold-change, log fold-change, p-values, and significance symbols for downstream analysis
+# ====================================================================================================
 
 # Combine All Comparison Vectors into a Data Frame
 df <- data.frame(
@@ -860,529 +1044,3 @@ write.csv(df, csv_file_name, row.names = FALSE)
 
 # Optional: Print a Completion Message
 cat("Comparison results have been saved to:", csv_file_name, "\n")
-
-
-
-
-
-
-
-
-############################################################################################################################################################
-# bifurcating experiment group into short and long term survivors
-########################################################################################################################################################################################
-# Load Required Libraries
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(Seurat)
-library(cowplot)
-
-# ==================================================================================================================================================================
-# Helper Function to Determine Significance Based on p-value
-get_significance <- function(p) {
-  if (is.na(p)) {
-    return("ns")
-  } else if (p < 0.001) {
-    return("***")
-  } else if (p < 0.01) {
-    return("**")
-  } else if (p < 0.05) {
-    return("*")
-  } else {
-    return("ns")
-  }
-}
-
-# ==================================================================================================================================================================
-# Optionally, if you have a Helper Function to Calculate Cluster Proportions, keep it here
-# get_cluster_proportion <- function(...) {
-#   # Your existing implementation
-# }
-
-# ==================================================================================================================================================================
-# 1) Define Survivor Groups (Control, ShortTerm, LongTerm)
-# ==================================================================================================================================================================
-control_group <- c(1, 4, 8, 9, 11)
-short_term_survivor_group <- c(7, 10, 12, 14, 18)
-long_term_survivor_group  <- c(2, 3, 5, 13, 19, 20, 21)
-
-# ==================================================================================================================================================================
-# 2) Load Survival Data
-# ==================================================================================================================================================================
-survival_data <- "/project/dtran642_927/Data/Collaborator/DJ/scRNAseq/latest_big_sequencing_projects/MK/Analysis/UF_WUSTL_combined/Aggregated/outs/NETZEN_analysis/new_analysis/patient_survival_data.csv"
-survival_df <- read.csv(survival_data)
-survival_df <- survival_df[survival_df$site == "UF",]
-survival_df$patient_id <- as.integer(survival_df$patient_id)
-
-# Filter for 'UF' site and assign new 3-group (SurvivalGroup)
-survival_df <- survival_df %>%
-  filter(site == "UF") %>%
-  mutate(
-    SurvivalGroup = case_when(
-      patient_id %in% short_term_survivor_group ~ "ShortTerm",
-      patient_id %in% long_term_survivor_group  ~ "LongTerm",
-      patient_id %in% control_group             ~ "Control",
-      TRUE                                      ~ NA_character_
-    )
-  ) %>%
-  filter(!is.na(SurvivalGroup))
-
-# Define a 4-group factor: (Control, Experiment, ShortTerm, LongTerm)
-# "Experiment" is effectively ShortTerm + LongTerm combined. 
-# But for plotting, we still show separate boxes for ShortTerm and LongTerm.
-survival_df <- survival_df %>%
-  mutate(
-    # For convenience, a 2-group to quickly identify experiment vs. control
-    ExpGroup = ifelse(SurvivalGroup == "Control", "Control", "Experiment")
-  )
-
-# We'll store a separate factor that can handle the 4 groups in box plots:
-# The logic is: if it's 'Control', set 'Control'. If it's 'ShortTerm' or 'LongTerm', 
-# that can either be recognized as part of 'Experiment' or kept separate in the final factor.
-# We'll unify them in the plotting code, so just keep 'SurvivalGroup' for that.
-
-# ==================================================================================================================================================================
-# 3) Load Seurat Object for T Cells
-# ==================================================================================================================================================================
-seurat_object_t_cells <- readRDS("/project/dtran642_927/Data/Collaborator/DJ/scRNAseq/latest_big_sequencing_projects/MK/new_sequencing_data/nextflow_pipeline/Aggregated/outs/NETZEN_analysis/clustering_res_1/MK_T_Cells_seurat_obj.RDS")
-seurat_metadata_t_cells <- seurat_object_t_cells@meta.data
-
-# ==================================================================================================================================================================
-# 4) Define Parameters - We keep them as options (no placeholders)
-# ==================================================================================================================================================================
-include_cluster_proportion <- TRUE   # Or TRUE, depending on your need
-method <- "difference"                # Could be "difference" or "ratio"
-
-gmt_file <- "/project/dtran642_927/SonLe/USC_Source/source/NetZenPathwayAnalysis/subsubset_output.gmt"
-
-# Define Pathways
-pathways <- c(
-  "GO_ADAPTIVE_IMMUNE_RESPONSE", "GO_T_CELL_ACTIVATION", "GO_REGULATION_OF_IMMUNE_RESPONSE",
-  "GO_POSITIVE_REGULATION_OF_IMMUNE_RESPONSE", "GO_POSITIVE_REGULATION_OF_IMMUNE_SYSTEM_PROCESS",
-  "REACTOME_IMMUNE_SYSTEM", "GO_IMMUNE_RESPONSE-ACTIVATING_SIGNALING_PATHWAY",
-  "GO_ACTIVATION_OF_IMMUNE_RESPONSE", "GO_REGULATION_OF_T_CELL_ACTIVATION",
-  "GO_T_CELL_ACTIVATION_INVOLVED_IN_IMMUNE_RESPONSE"
-)
-
-# Define the Mapping from Celltypes to Clusters
-mapping <- list(
-  "Activated_CD4"                 = c(0),
-  "Effector_CD8"                  = c(1),
-  "Effector_Memory_Precursor_CD8" = c(2),
-  "Exhausted_T"                   = c(3),
-  "Gamma_Delta_T"                 = c(4),
-  "Active_CD4"                    = c(5),
-  "Naive_CD4"                     = c(6, 9, 18),
-  "Memory_CD4"                    = c(7),
-  "Stem_Like_CD8"                 = c(8),
-  "Effector_Memory_CD8"           = c(10),
-  "Central_Memory_CD8"            = c(12),
-  "GZMK_Effector_Memory_CD8"      = c(13),
-  "Proliferating_Effector"        = c(14, 16, 17)
-)
-
-celltype_to_cluster <- do.call(rbind, lapply(names(mapping), function(celltype) {
-  data.frame(celltype = gsub(" ", "_", celltype), cluster = mapping[[celltype]], stringsAsFactors = FALSE)
-}))
-
-# Define Timepoints and Pair Combinations
-timepoints <- c("Pre", "C1", "C2")
-pair_combinations <- combn(timepoints, 2)
-pairs_list <- lapply(1:ncol(pair_combinations), function(i) pair_combinations[, i])
-
-# ==================================================================================================================================================================
-# 5) Initialize Vectors to Store Comparison Results
-# ==================================================================================================================================================================
-pathway_list         <- c()
-celltype_list        <- c()
-comparison_list      <- c()
-
-# We'll store p-values and significance for 4 key comparisons
-pvalue_control_expt  <- c()  # Control vs Experiment
-pvalue_control_short <- c()  # Control vs ShortTerm
-pvalue_control_long  <- c()  # Control vs LongTerm
-pvalue_short_long    <- c()  # ShortTerm vs LongTerm
-
-significance_control_expt  <- c()
-significance_control_short <- c()
-significance_control_long  <- c()
-significance_short_long    <- c()
-
-# If you want fold-changes or logFC, keep them:
-fc_list    <- c()
-logfc_list <- c()
-
-# ==================================================================================================================================================================
-# 6) Main Loop Over Each Pathway and Celltype
-# ==================================================================================================================================================================
-for (pathway in pathways) {
-  for (celltype in unique(celltype_to_cluster$celltype)) {
-    
-    # Get the list of clusters for the current celltype
-    cluster_list <- celltype_to_cluster %>%
-      filter(celltype == !!celltype) %>%
-      pull(cluster)
-    
-    # Subset and normalize the Seurat Object
-    seurat_object_t_cell_subset <- subset(seurat_object_t_cells, subset = seurat_clusters %in% cluster_list)
-    seurat_object_t_cell_subset <- NormalizeData(
-      seurat_object_t_cell_subset,
-      normalization.method = "RC",
-      scale.factor = 1e6,
-      verbose = TRUE,
-      assay = "RNA"
-    )
-    
-    # ----------------------------------------------------------------------------------------------
-    # 6a) Call your custom function to get updated Survival Data with Pathway info
-    #     (Assumes create_survival_data is defined somewhere in your environment)
-    # ----------------------------------------------------------------------------------------------
-    updated_survival_df <- create_survival_data(gmt_file, pathway, seurat_object_t_cell_subset, survival_data)
-    updated_survival_df <- updated_survival_df %>% filter(IDH != "POS", site == "UF")
-    
-    # Merge with new grouping from survival_df
-    updated_survival_df$patient_id <- as.integer(updated_survival_df$patient_id)
-    merged_survival_df <- updated_survival_df %>%
-      left_join(
-        survival_df %>% 
-          select(patient_id, SurvivalGroup, ExpGroup),
-        by = "patient_id"
-      ) %>%
-      filter(!is.na(SurvivalGroup))
-    
-    # ----------------------------------------------------------------------------------------------
-    # 6b) Iterate Over Timepoint Pairs (e.g., Pre vs C1, Pre vs C2, C1 vs C2)
-    # ----------------------------------------------------------------------------------------------
-    for (timepoint_pair in pairs_list) {
-      temp_df <- merged_survival_df
-      
-      timepoint_a <- timepoint_pair[1]
-      timepoint_b <- timepoint_pair[2]
-      
-      # If needed, incorporate cluster proportion
-      if (include_cluster_proportion) {
-        # 6b-i) e.g., get cluster proportion
-        timepoint_a_cluster_proportion_df <- get_cluster_proportion(
-          seurat_metadata_t_cells, "Patient", "TimePoint", "seurat_clusters",
-          clusters_of_interest = cluster_list, timepoint_of_interest = timepoint_a
-        )
-        timepoint_b_cluster_proportion_df <- get_cluster_proportion(
-          seurat_metadata_t_cells, "Patient", "TimePoint", "seurat_clusters",
-          clusters_of_interest = cluster_list, timepoint_of_interest = timepoint_b
-        )
-        
-        # Merge cluster proportion data
-        temp_df <- merge(temp_df, timepoint_a_cluster_proportion_df, by = "patient_id")
-        temp_df <- merge(temp_df, timepoint_b_cluster_proportion_df, by = "patient_id")
-        
-        # Calculate integrated Pathway Signal
-        temp_df <- temp_df %>%
-          mutate(
-            !!paste0("Pathway_Signal_", timepoint_a) := 
-              !!sym(paste0("Mean_Expr_", timepoint_a)) * !!sym(paste0("Cluster_Proportion_", timepoint_a)),
-            !!paste0("Pathway_Signal_", timepoint_b) := 
-              !!sym(paste0("Mean_Expr_", timepoint_b)) * !!sym(paste0("Cluster_Proportion_", timepoint_b))
-          )
-      } else {
-        # 6b-ii) If NO cluster proportion, simply copy Mean_Expr_<TP>
-        temp_df <- temp_df %>%
-          mutate(
-            !!paste0("Pathway_Signal_", timepoint_a) := !!sym(paste0("Mean_Expr_", timepoint_a)),
-            !!paste0("Pathway_Signal_", timepoint_b) := !!sym(paste0("Mean_Expr_", timepoint_b))
-          )
-      }
-      
-      # Calculate signal_change based on 'method'
-      if (method == "difference") {
-        temp_df <- temp_df %>%
-          mutate(
-            signal_change = !!sym(paste0("Pathway_Signal_", timepoint_b)) - 
-              !!sym(paste0("Pathway_Signal_", timepoint_a))
-          )
-      } else if (method == "ratio") {
-        temp_df <- temp_df %>%
-          mutate(
-            signal_change = !!sym(paste0("Pathway_Signal_", timepoint_b)) / 
-              !!sym(paste0("Pathway_Signal_", timepoint_a))
-          )
-      }
-      
-      # --------------------------------------------------------------------------------------------
-      # 6b-iii) Create the LINE PLOT, colored by 3-group 'SurvivalGroup'
-      # --------------------------------------------------------------------------------------------
-      # Convert wide to long for line plot
-      # Remove 'Pathway_Signal_' Prefix from Column Names for Plotting
-      
-      temp_df_line_plot <- temp_df
-      colnames(temp_df_line_plot) <- sub("^Pathway_Signal_", "", colnames(temp_df_line_plot))
-      
-      data_long <- temp_df_line_plot %>%
-        pivot_longer(
-          cols = c(timepoint_a, timepoint_b),
-          names_to = "Time_Point",
-          values_to = "Pathway_Signal"
-        )
-      
-      data_long$Time_Point <- factor(data_long$Time_Point, levels = c(timepoint_a, timepoint_b))
-      
-      # Color scheme (Control=yellow, ShortTerm=blue, LongTerm=red)
-      color_map_line <- c("Control"="yellow", "ShortTerm"="blue", "LongTerm"="red")
-      
-      p_line <- ggplot(data_long, aes(
-        x = Time_Point, 
-        y = Pathway_Signal, 
-        group = patient_id, 
-        color = SurvivalGroup)) +
-        geom_line(size=1) +
-        geom_point(size=3) +
-        scale_color_manual(values = color_map_line) +
-        labs(
-          title = paste0("Pathway Signal Change by SurvivalGroup (", timepoint_a, " vs. ", timepoint_b, ")"),
-          x = NULL,
-          y = "Pathway Signal"
-        ) +
-        theme_minimal() +
-        theme(
-          axis.line = element_line(color = "black"),
-          axis.title.x = element_blank(),
-          axis.title.y = element_text(size = 20),
-          plot.title  = element_text(size = 20),
-          axis.text.y = element_text(size = 15),
-          axis.text.x = element_text(size = 12),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(),
-          axis.ticks.y = element_line()
-        )
-      
-      # --------------------------------------------------------------------------------------------
-      # 6b-iv) Create the BOX PLOT (4 boxes: Control, Experiment, ShortTerm, LongTerm)
-      # --------------------------------------------------------------------------------------------
-      # We'll define a new factor for box plot
-      # If SurvivalGroup == Control => "Control"
-      # Else if ShortTerm or LongTerm => these remain separate
-      # We'll also define "Experiment" to group short+long for one comparison
-      temp_df <- temp_df %>%
-        mutate(
-          FourGroup = case_when(
-            SurvivalGroup == "Control"   ~ "Control",
-            SurvivalGroup == "ShortTerm" ~ "ShortTerm",
-            SurvivalGroup == "LongTerm"  ~ "LongTerm",
-            TRUE ~ NA_character_
-          ),
-          # "ExpGroup" from earlier merges short + long as "Experiment"
-          # We'll use that for one of the comparisons
-          ExpGroup = ifelse(SurvivalGroup == "Control", "Control", "Experiment")
-        )
-      
-      # We define factor levels for plotting: Control, Experiment, ShortTerm, LongTerm
-      # (Though "Experiment" lumps short+long, we still want separate boxes for short & long.)
-      temp_df$FourGroupForPlot <- ifelse(
-        temp_df$FourGroup == "Control", "Control",
-        ifelse(temp_df$FourGroup == "ShortTerm","ShortTerm",
-               ifelse(temp_df$FourGroup == "LongTerm", "LongTerm","Experiment"))
-      )
-      
-      temp_df$FourGroupForPlot <- factor(
-        temp_df$FourGroupForPlot,
-        levels=c("Control","Experiment","ShortTerm","LongTerm")
-      )
-      
-      # Color scheme for 4 boxes
-      color_map_box <- c(
-        "Control"    = "yellow",
-        "Experiment" = "pink",
-        "ShortTerm"  = "blue",
-        "LongTerm"   = "red"
-      )
-      
-      p_box <- ggplot(temp_df, aes(x = FourGroupForPlot, y = signal_change, fill = FourGroupForPlot)) +
-        geom_boxplot(
-          width = 0.5, 
-          position = position_dodge(width = 1.2), 
-          outlier.shape = NA
-        ) +
-        geom_jitter(
-          position = position_jitterdodge(jitter.width = 1, dodge.width = 1.2), 
-          size = 4, 
-          alpha = 0.8
-        ) +
-        scale_fill_manual(values = color_map_box) +
-        labs(
-          title = paste(
-            "Change between", timepoint_a, "and", timepoint_b
-          ),
-          x = NULL,
-          y = "Signal Change"
-        ) +
-        theme_minimal() +
-        theme(
-          axis.line = element_line(color = "black"),
-          axis.title.x = element_blank(),
-          axis.title.y = element_text(size = 20),
-          plot.title  = element_text(size = 20),
-          axis.text.y = element_text(size = 15),
-          axis.text.x = element_text(size = 12),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(),
-          axis.ticks.y = element_line(),
-          legend.position = "none"
-        )
-      
-      # --------------------------------------------------------------------------------------------
-      # 6b-v) Calculate 4 Wilcoxon p-values:
-      #       1) Control vs. Experiment
-      #       2) Control vs. ShortTerm
-      #       3) Control vs. LongTerm
-      #       4) ShortTerm vs. LongTerm
-      # --------------------------------------------------------------------------------------------
-      # We'll define a small function to do the test or return NA if not feasible
-      pairwise_wilcox <- function(df, group_col, val_col, g1, g2) {
-        df_sub <- df %>% filter(!!sym(group_col) %in% c(g1, g2))
-        if (length(unique(df_sub[[group_col]])) < 2) return(NA_real_)
-        if (sum(df_sub[[group_col]]==g1) < 2 || sum(df_sub[[group_col]]==g2) < 2) return(NA_real_)
-        
-        out_p <- tryCatch({
-          wt <- wilcox.test(df_sub[[val_col]] ~ df_sub[[group_col]])
-          wt$p.value
-        }, error = function(e) NA_real_)
-        
-        out_p
-      }
-      
-      # 1) Control vs. Experiment => using ExpGroup
-      p_val_ctrl_expt <- pairwise_wilcox(temp_df, "ExpGroup", "signal_change", "Control", "Experiment")
-      sig_ctrl_expt   <- get_significance(p_val_ctrl_expt)
-      
-      # 2) Control vs. ShortTerm => using FourGroup
-      p_val_ctrl_short <- pairwise_wilcox(temp_df, "FourGroup", "signal_change", "Control", "ShortTerm")
-      sig_ctrl_short   <- get_significance(p_val_ctrl_short)
-      
-      # 3) Control vs. LongTerm => using FourGroup
-      p_val_ctrl_long <- pairwise_wilcox(temp_df, "FourGroup", "signal_change", "Control", "LongTerm")
-      sig_ctrl_long   <- get_significance(p_val_ctrl_long)
-      
-      # 4) ShortTerm vs. LongTerm => using FourGroup
-      p_val_short_long <- pairwise_wilcox(temp_df, "FourGroup", "signal_change", "ShortTerm", "LongTerm")
-      sig_short_long   <- get_significance(p_val_short_long)
-      
-      # Store in global vectors
-      pathway_list         <- c(pathway_list, pathway)
-      celltype_list        <- c(celltype_list, celltype)
-      comparison_list      <- c(comparison_list, paste(timepoint_a, timepoint_b, sep="_vs_"))
-      
-      pvalue_control_expt  <- c(pvalue_control_expt,  p_val_ctrl_expt)
-      pvalue_control_short <- c(pvalue_control_short, p_val_ctrl_short)
-      pvalue_control_long  <- c(pvalue_control_long,  p_val_ctrl_long)
-      pvalue_short_long    <- c(pvalue_short_long,    p_val_short_long)
-      
-      significance_control_expt  <- c(significance_control_expt,  sig_ctrl_expt)
-      significance_control_short <- c(significance_control_short, sig_ctrl_short)
-      significance_control_long  <- c(significance_control_long,  sig_ctrl_long)
-      significance_short_long    <- c(significance_short_long,    sig_short_long)
-      
-      # If you want to store fold change or logFC, you can calculate them here
-      fc_list    <- c(fc_list, NA)
-      logfc_list <- c(logfc_list, NA)
-      
-      # --------------------------------------------------------------------------------------------
-      # 6b-vi) Combine the line and box plots, then save
-      # --------------------------------------------------------------------------------------------
-      final_plot <- plot_grid(
-        p_line, 
-        p_box, 
-        ncol = 2, 
-        rel_widths = c(1,1)
-      )
-      
-      # Decide output directory based on your original structure
-      # For difference & without_cluster_proportion, same as original, but with a suffix
-      # In your original code, the path for difference & no proportion is:
-      # "/project/dtran642_927/.../without_cluster_proportion/difference/"
-      if (!include_cluster_proportion) {
-        if (method == "difference") {
-          plot_dir <- "/project/dtran642_927/Data/Collaborator/DJ/scRNAseq/latest_big_sequencing_projects/MK/new_sequencing_data/ITT/Pathway_Activity_Comparison_Results/without_cluster_proportion/difference/"
-        } else {
-          plot_dir <- "/project/dtran642_927/Data/Collaborator/DJ/scRNAseq/latest_big_sequencing_projects/MK/new_sequencing_data/ITT/Pathway_Activity_Comparison_Results/without_cluster_proportion/ratio/"
-        }
-      } else {
-        if (method == "difference") {
-          plot_dir <- "/project/dtran642_927/Data/Collaborator/DJ/scRNAseq/latest_big_sequencing_projects/MK/new_sequencing_data/ITT/Pathway_Activity_Comparison_Results/with_cluster_proportion/difference/"
-        } else {
-          plot_dir <- "/project/dtran642_927/Data/Collaborator/DJ/scRNAseq/latest_big_sequencing_projects/MK/new_sequencing_data/ITT/Pathway_Activity_Comparison_Results/with_cluster_proportion/ratio/"
-        }
-      }
-      
-      if (!dir.exists(plot_dir)) {
-        dir.create(plot_dir, recursive = TRUE)
-      }
-      
-      # Add suffix "_new_grouping" to the PDF filename
-      file_name <- paste0(
-        plot_dir, 
-        celltype, "_", pathway, "_", timepoint_a, "_vs_", timepoint_b,
-        "_Signal_Change_Comparison_new_grouping.pdf"
-      )
-      ggsave(
-        filename = file_name,
-        plot = final_plot,
-        device = "pdf",
-        width = 7 * 1.5,  # adjust as needed
-        height = 6 * 1.2,
-        limitsize = FALSE
-      )
-    } # end for timepoint pairs
-  } # end for celltype
-} # end for pathway
-
-# ==================================================================================================================================================================
-# 7) Create and Save the Comparison Results Data Frame with Significance
-# ==================================================================================================================================================================
-df <- data.frame(
-  pathway     = pathway_list,
-  celltype    = celltype_list,
-  comparison  = comparison_list,
-  
-  pvalue_Control_vs_Experiment   = pvalue_control_expt,
-  significance_Control_vs_Experiment = significance_control_expt,
-  
-  pvalue_Control_vs_ShortTerm    = pvalue_control_short,
-  significance_Control_vs_ShortTerm = significance_control_short,
-  
-  pvalue_Control_vs_LongTerm     = pvalue_control_long,
-  significance_Control_vs_LongTerm = significance_control_long,
-  
-  pvalue_ShortTerm_vs_LongTerm   = pvalue_short_long,
-  significance_ShortTerm_vs_LongTerm = significance_short_long,
-  
-  FC        = fc_list,    # placeholders if you do fold-change
-  logFC     = logfc_list, # placeholders if you do log fold change
-  
-  stringsAsFactors = FALSE
-)
-
-# Determine output_dir (identical logic as for plots)
-if (!include_cluster_proportion) {
-  if (method == "difference") {
-    output_dir <- "/project/dtran642_927/Data/Collaborator/DJ/scRNAseq/latest_big_sequencing_projects/MK/new_sequencing_data/ITT/Pathway_Activity_Comparison_Results/without_cluster_proportion/difference/"
-  } else {
-    output_dir <- "/project/dtran642_927/Data/Collaborator/DJ/scRNAseq/latest_big_sequencing_projects/MK/new_sequencing_data/ITT/Pathway_Activity_Comparison_Results/without_cluster_proportion/ratio/"
-  }
-} else {
-  if (method == "difference") {
-    output_dir <- "/project/dtran642_927/Data/Collaborator/DJ/scRNAseq/latest_big_sequencing_projects/MK/new_sequencing_data/ITT/Pathway_Activity_Comparison_Results/with_cluster_proportion/difference/"
-  } else {
-    output_dir <- "/project/dtran642_927/Data/Collaborator/DJ/scRNAseq/latest_big_sequencing_projects/MK/new_sequencing_data/ITT/Pathway_Activity_Comparison_Results/with_cluster_proportion/ratio/"
-  }
-}
-
-if (!dir.exists(output_dir)) {
-  dir.create(output_dir, recursive = TRUE)
-}
-
-# CSV file name with "_new_grouping" suffix
-csv_file_name <- paste0(output_dir, "signal_comparison_in_T_cells_new_grouping.csv")
-
-write.csv(df, csv_file_name, row.names = FALSE)
-cat("Comparison results have been saved to:", csv_file_name, "\n")
-

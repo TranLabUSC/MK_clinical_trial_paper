@@ -1,0 +1,252 @@
+======================================================================
+FILE COMPARISON REPORT
+======================================================================
+Generated: 2025-12-08 11:12:21
+Current Directory: /home/harshit/Documents/github/MK Analysis Scripts
+GBM Directory: /home/harshit/remote_mount/Data/Collaborator/DJ/scRNAseq/latest_big_sequencing_projects/MK/new_sequencing_data/github/GBM
+ITT Directory: /home/harshit/remote_mount/Data/Collaborator/DJ/scRNAseq/latest_big_sequencing_projects/MK/new_sequencing_data/github/ITT
+======================================================================
+
+======================================================================
+COMPARISON: Current Directory vs GBM
+======================================================================
+
+FILES ONLY IN CURRENT DIRECTORY (8):
+  - Clonal_Tracking/final_nomenclature/coi/.ipynb_checkpoints/t_cell_optimal_transport-checkpoint.ipynb
+  - Clonal_Tracking/final_nomenclature/coi/optimal_transport.R
+  - Clonal_Tracking/final_nomenclature/coi/t_cell_optimal_transport.ipynb
+  - Clonal_Tracking/final_nomenclature/coi_central_memory_cd8/.ipynb_checkpoints/central_memory_cd8_t_cell_optimal_transport-checkpoint.ipynb
+  - Clonal_Tracking/final_nomenclature/coi_central_memory_cd8/central_memory_cd8_t_cell_optimal_transport.ipynb
+  - file_comparison_report.txt
+  - optimal_transport.R
+  - t_cell_optimal_transport.ipynb
+
+FILES ONLY IN GBM (2):
+  - Annotation/cluster_plots.R
+  - Annotation/gene_coexpression_analysis_report.md
+
+COMPARING COMMON FILES (90):
+  ⚠ MODIFIED:  Annotation/annotation.R
+  ✓ IDENTICAL: NC_Monocytes_Analysis/.~lock.cluster_10_de_result.csv#
+  ✓ IDENTICAL: NC_Monocytes_Analysis/.~lock.differential_expression_results.csv#
+  ✓ IDENTICAL: NC_Monocytes_Analysis/.~lock.exp_C_Mono_Cells_differential_expression_results.csv#
+  ✓ IDENTICAL: NC_Monocytes_Analysis/.~lock.exp_DC_CCR2_Pos_Cells_differential_expression_results.csv#
+  ✓ IDENTICAL: NC_Monocytes_Analysis/.~lock.exp_DC_CCR2_Pos_Cells_scaled_normalized_log2FC_C1_vs_Pre.csv#
+  ✓ IDENTICAL: NC_Monocytes_Analysis/.~lock.exp_DC_differential_expression_results.csv#
+  ✓ IDENTICAL: NC_Monocytes_Analysis/.~lock.exp_DC_scaled_normalized_log2FC_C1_vs_Pre.csv#
+  ✓ IDENTICAL: NC_Monocytes_Analysis/.~lock.scaled_normalized_log2FC_C1_vs_Pre.csv#
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow.log
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow.log.1
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow.log.2
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow.log.3
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow.log.4
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow.log.5
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow.log.6
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow.log.7
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow.log.8
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow.log.9
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/12933e3c-07a6-47dc-b2ff-3a1ada3244f0/db/000003.log
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/12933e3c-07a6-47dc-b2ff-3a1ada3244f0/db/CURRENT
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/12933e3c-07a6-47dc-b2ff-3a1ada3244f0/db/LOCK
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/12933e3c-07a6-47dc-b2ff-3a1ada3244f0/db/MANIFEST-000002
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/12933e3c-07a6-47dc-b2ff-3a1ada3244f0/index.wise_feynman
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/1ad03947-3fed-49d2-87f3-38db5dc0842d/db/000003.log
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/1ad03947-3fed-49d2-87f3-38db5dc0842d/db/CURRENT
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/1ad03947-3fed-49d2-87f3-38db5dc0842d/db/LOCK
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/1ad03947-3fed-49d2-87f3-38db5dc0842d/db/MANIFEST-000002
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/1ad03947-3fed-49d2-87f3-38db5dc0842d/index.festering_kimura
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/2df9d5cd-cb17-4127-9e5e-8e0c1265c7c2/db/000003.log
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/2df9d5cd-cb17-4127-9e5e-8e0c1265c7c2/db/CURRENT
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/2df9d5cd-cb17-4127-9e5e-8e0c1265c7c2/db/LOCK
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/2df9d5cd-cb17-4127-9e5e-8e0c1265c7c2/db/MANIFEST-000002
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/2df9d5cd-cb17-4127-9e5e-8e0c1265c7c2/index.wise_goodall
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/8a7f2a31-dbea-4bd4-b759-418ac456da05/db/000003.log
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/8a7f2a31-dbea-4bd4-b759-418ac456da05/db/CURRENT
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/8a7f2a31-dbea-4bd4-b759-418ac456da05/db/LOCK
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/8a7f2a31-dbea-4bd4-b759-418ac456da05/db/MANIFEST-000002
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/8a7f2a31-dbea-4bd4-b759-418ac456da05/index.friendly_gates
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/916495d4-6475-403f-80ef-68bd75128a11/db/000003.log
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/916495d4-6475-403f-80ef-68bd75128a11/db/CURRENT
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/916495d4-6475-403f-80ef-68bd75128a11/db/LOCK
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/916495d4-6475-403f-80ef-68bd75128a11/db/MANIFEST-000002
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/916495d4-6475-403f-80ef-68bd75128a11/index.naughty_banach
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/9ef911ee-f17e-4d46-b752-bcfda92e858c/db/000003.log
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/9ef911ee-f17e-4d46-b752-bcfda92e858c/db/CURRENT
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/9ef911ee-f17e-4d46-b752-bcfda92e858c/db/LOCK
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/9ef911ee-f17e-4d46-b752-bcfda92e858c/db/MANIFEST-000002
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/9ef911ee-f17e-4d46-b752-bcfda92e858c/index.voluminous_montalcini
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/ab98a62e-05e7-4e69-91d0-6f4b4d2cb2f5/db/000003.log
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/ab98a62e-05e7-4e69-91d0-6f4b4d2cb2f5/db/CURRENT
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/ab98a62e-05e7-4e69-91d0-6f4b4d2cb2f5/db/LOCK
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/ab98a62e-05e7-4e69-91d0-6f4b4d2cb2f5/db/MANIFEST-000002
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/ab98a62e-05e7-4e69-91d0-6f4b4d2cb2f5/index.magical_mestorf
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/bfb3ed17-f806-4fda-bbce-435dd1b1aded/db/000003.log
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/bfb3ed17-f806-4fda-bbce-435dd1b1aded/db/CURRENT
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/bfb3ed17-f806-4fda-bbce-435dd1b1aded/db/LOCK
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/bfb3ed17-f806-4fda-bbce-435dd1b1aded/db/MANIFEST-000002
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/bfb3ed17-f806-4fda-bbce-435dd1b1aded/index.shrivelled_laplace
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/ce2b62cb-12ca-49c8-ac94-20549535c9a1/db/000003.log
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/ce2b62cb-12ca-49c8-ac94-20549535c9a1/db/CURRENT
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/ce2b62cb-12ca-49c8-ac94-20549535c9a1/db/LOCK
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/ce2b62cb-12ca-49c8-ac94-20549535c9a1/db/MANIFEST-000002
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/ce2b62cb-12ca-49c8-ac94-20549535c9a1/index.desperate_albattani
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/d39c204b-ded9-45ec-81cf-ec094ad369cf/db/000003.log
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/d39c204b-ded9-45ec-81cf-ec094ad369cf/db/CURRENT
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/d39c204b-ded9-45ec-81cf-ec094ad369cf/db/LOCK
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/d39c204b-ded9-45ec-81cf-ec094ad369cf/db/MANIFEST-000002
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/cache/d39c204b-ded9-45ec-81cf-ec094ad369cf/index.drunk_mcclintock
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/.nextflow/history
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/GSEA.nf
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/gsea_command
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/make_rnk.R
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/nextflow.GSEA.config
+  ✓ IDENTICAL: NC_Monocytes_Analysis/GSEA/nextflow_run.sh
+  ⚠ MODIFIED:  UMAP_comparisons.R
+  ✓ IDENTICAL: clonal_expansion.R
+  ⚠ MODIFIED:  clonal_expansion_analysis_1.R
+  ⚠ MODIFIED:  clonal_expansion_calculation_3.R
+  ⚠ MODIFIED:  clonal_expansion_plots_4.R
+  ⚠ MODIFIED:  cluster_proportion_comparison_new.R
+  ⚠ MODIFIED:  diversity_calculation_2.R
+  ✓ IDENTICAL: get_metadata.R
+  ✓ IDENTICAL: immune_checkpoint_comparison.R
+  ⚠ MODIFIED:  nc_monocytes_analysis.R
+  ✓ IDENTICAL: neoantigen_analysis.R
+  ⚠ MODIFIED:  pathway_activity_comparison_new.R
+  ✓ IDENTICAL: pseudo_time_analysis_t_cells.R
+  ✓ IDENTICAL: short_term_long_term_analysis.R
+  ⚠ MODIFIED:  track_t_cell_subpopulation_clones.R
+
+======================================================================
+SUMMARY for GBM:
+  Total files in current: 98
+  Total files in GBM: 92
+  Common files: 90
+  Identical: 80
+  Modified: 10
+  Only in current: 8
+  Only in GBM: 2
+======================================================================
+
+======================================================================
+COMPARISON: Current Directory vs ITT
+======================================================================
+
+FILES ONLY IN CURRENT DIRECTORY (80):
+  - NC_Monocytes_Analysis/.~lock.cluster_10_de_result.csv#
+  - NC_Monocytes_Analysis/.~lock.differential_expression_results.csv#
+  - NC_Monocytes_Analysis/.~lock.exp_C_Mono_Cells_differential_expression_results.csv#
+  - NC_Monocytes_Analysis/.~lock.exp_DC_CCR2_Pos_Cells_differential_expression_results.csv#
+  - NC_Monocytes_Analysis/.~lock.exp_DC_CCR2_Pos_Cells_scaled_normalized_log2FC_C1_vs_Pre.csv#
+  - NC_Monocytes_Analysis/.~lock.exp_DC_differential_expression_results.csv#
+  - NC_Monocytes_Analysis/.~lock.exp_DC_scaled_normalized_log2FC_C1_vs_Pre.csv#
+  - NC_Monocytes_Analysis/.~lock.scaled_normalized_log2FC_C1_vs_Pre.csv#
+  - NC_Monocytes_Analysis/GSEA/.nextflow.log
+  - NC_Monocytes_Analysis/GSEA/.nextflow.log.1
+  - NC_Monocytes_Analysis/GSEA/.nextflow.log.2
+  - NC_Monocytes_Analysis/GSEA/.nextflow.log.3
+  - NC_Monocytes_Analysis/GSEA/.nextflow.log.4
+  - NC_Monocytes_Analysis/GSEA/.nextflow.log.5
+  - NC_Monocytes_Analysis/GSEA/.nextflow.log.6
+  - NC_Monocytes_Analysis/GSEA/.nextflow.log.7
+  - NC_Monocytes_Analysis/GSEA/.nextflow.log.8
+  - NC_Monocytes_Analysis/GSEA/.nextflow.log.9
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/12933e3c-07a6-47dc-b2ff-3a1ada3244f0/db/000003.log
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/12933e3c-07a6-47dc-b2ff-3a1ada3244f0/db/CURRENT
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/12933e3c-07a6-47dc-b2ff-3a1ada3244f0/db/LOCK
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/12933e3c-07a6-47dc-b2ff-3a1ada3244f0/db/MANIFEST-000002
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/12933e3c-07a6-47dc-b2ff-3a1ada3244f0/index.wise_feynman
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/1ad03947-3fed-49d2-87f3-38db5dc0842d/db/000003.log
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/1ad03947-3fed-49d2-87f3-38db5dc0842d/db/CURRENT
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/1ad03947-3fed-49d2-87f3-38db5dc0842d/db/LOCK
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/1ad03947-3fed-49d2-87f3-38db5dc0842d/db/MANIFEST-000002
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/1ad03947-3fed-49d2-87f3-38db5dc0842d/index.festering_kimura
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/2df9d5cd-cb17-4127-9e5e-8e0c1265c7c2/db/000003.log
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/2df9d5cd-cb17-4127-9e5e-8e0c1265c7c2/db/CURRENT
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/2df9d5cd-cb17-4127-9e5e-8e0c1265c7c2/db/LOCK
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/2df9d5cd-cb17-4127-9e5e-8e0c1265c7c2/db/MANIFEST-000002
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/2df9d5cd-cb17-4127-9e5e-8e0c1265c7c2/index.wise_goodall
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/8a7f2a31-dbea-4bd4-b759-418ac456da05/db/000003.log
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/8a7f2a31-dbea-4bd4-b759-418ac456da05/db/CURRENT
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/8a7f2a31-dbea-4bd4-b759-418ac456da05/db/LOCK
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/8a7f2a31-dbea-4bd4-b759-418ac456da05/db/MANIFEST-000002
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/8a7f2a31-dbea-4bd4-b759-418ac456da05/index.friendly_gates
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/916495d4-6475-403f-80ef-68bd75128a11/db/000003.log
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/916495d4-6475-403f-80ef-68bd75128a11/db/CURRENT
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/916495d4-6475-403f-80ef-68bd75128a11/db/LOCK
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/916495d4-6475-403f-80ef-68bd75128a11/db/MANIFEST-000002
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/916495d4-6475-403f-80ef-68bd75128a11/index.naughty_banach
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/9ef911ee-f17e-4d46-b752-bcfda92e858c/db/000003.log
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/9ef911ee-f17e-4d46-b752-bcfda92e858c/db/CURRENT
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/9ef911ee-f17e-4d46-b752-bcfda92e858c/db/LOCK
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/9ef911ee-f17e-4d46-b752-bcfda92e858c/db/MANIFEST-000002
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/9ef911ee-f17e-4d46-b752-bcfda92e858c/index.voluminous_montalcini
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/ab98a62e-05e7-4e69-91d0-6f4b4d2cb2f5/db/000003.log
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/ab98a62e-05e7-4e69-91d0-6f4b4d2cb2f5/db/CURRENT
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/ab98a62e-05e7-4e69-91d0-6f4b4d2cb2f5/db/LOCK
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/ab98a62e-05e7-4e69-91d0-6f4b4d2cb2f5/db/MANIFEST-000002
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/ab98a62e-05e7-4e69-91d0-6f4b4d2cb2f5/index.magical_mestorf
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/bfb3ed17-f806-4fda-bbce-435dd1b1aded/db/000003.log
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/bfb3ed17-f806-4fda-bbce-435dd1b1aded/db/CURRENT
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/bfb3ed17-f806-4fda-bbce-435dd1b1aded/db/LOCK
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/bfb3ed17-f806-4fda-bbce-435dd1b1aded/db/MANIFEST-000002
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/bfb3ed17-f806-4fda-bbce-435dd1b1aded/index.shrivelled_laplace
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/ce2b62cb-12ca-49c8-ac94-20549535c9a1/db/000003.log
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/ce2b62cb-12ca-49c8-ac94-20549535c9a1/db/CURRENT
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/ce2b62cb-12ca-49c8-ac94-20549535c9a1/db/LOCK
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/ce2b62cb-12ca-49c8-ac94-20549535c9a1/db/MANIFEST-000002
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/ce2b62cb-12ca-49c8-ac94-20549535c9a1/index.desperate_albattani
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/d39c204b-ded9-45ec-81cf-ec094ad369cf/db/000003.log
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/d39c204b-ded9-45ec-81cf-ec094ad369cf/db/CURRENT
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/d39c204b-ded9-45ec-81cf-ec094ad369cf/db/LOCK
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/d39c204b-ded9-45ec-81cf-ec094ad369cf/db/MANIFEST-000002
+  - NC_Monocytes_Analysis/GSEA/.nextflow/cache/d39c204b-ded9-45ec-81cf-ec094ad369cf/index.drunk_mcclintock
+  - NC_Monocytes_Analysis/GSEA/.nextflow/history
+  - NC_Monocytes_Analysis/GSEA/GSEA.nf
+  - NC_Monocytes_Analysis/GSEA/gsea_command
+  - NC_Monocytes_Analysis/GSEA/make_rnk.R
+  - NC_Monocytes_Analysis/GSEA/nextflow.GSEA.config
+  - NC_Monocytes_Analysis/GSEA/nextflow_run.sh
+  - file_comparison_report.txt
+  - immune_checkpoint_comparison.R
+  - nc_monocytes_analysis.R
+  - neoantigen_analysis.R
+  - pseudo_time_analysis_t_cells.R
+  - short_term_long_term_analysis.R
+
+FILES ONLY IN ITT (4):
+  - .ipynb_checkpoints/optimal_transport-checkpoint.R
+  - .ipynb_checkpoints/t_cell_optimal_transport-checkpoint.ipynb
+  - cluster_proportion_comparison.R
+  - pathway_activity_comparison.R
+
+COMPARING COMMON FILES (18):
+  ✓ IDENTICAL: Annotation/annotation.R
+  ✓ IDENTICAL: Clonal_Tracking/final_nomenclature/coi/.ipynb_checkpoints/t_cell_optimal_transport-checkpoint.ipynb
+  ✓ IDENTICAL: Clonal_Tracking/final_nomenclature/coi/optimal_transport.R
+  ✓ IDENTICAL: Clonal_Tracking/final_nomenclature/coi/t_cell_optimal_transport.ipynb
+  ✓ IDENTICAL: Clonal_Tracking/final_nomenclature/coi_central_memory_cd8/.ipynb_checkpoints/central_memory_cd8_t_cell_optimal_transport-checkpoint.ipynb
+  ✓ IDENTICAL: Clonal_Tracking/final_nomenclature/coi_central_memory_cd8/central_memory_cd8_t_cell_optimal_transport.ipynb
+  ✓ IDENTICAL: UMAP_comparisons.R
+  ✓ IDENTICAL: clonal_expansion.R
+  ✓ IDENTICAL: clonal_expansion_analysis_1.R
+  ✓ IDENTICAL: clonal_expansion_calculation_3.R
+  ✓ IDENTICAL: clonal_expansion_plots_4.R
+  ✓ IDENTICAL: cluster_proportion_comparison_new.R
+  ✓ IDENTICAL: diversity_calculation_2.R
+  ✓ IDENTICAL: get_metadata.R
+  ✓ IDENTICAL: optimal_transport.R
+  ✓ IDENTICAL: pathway_activity_comparison_new.R
+  ✓ IDENTICAL: t_cell_optimal_transport.ipynb
+  ✓ IDENTICAL: track_t_cell_subpopulation_clones.R
+
+======================================================================
+SUMMARY for ITT:
+  Total files in current: 98
+  Total files in ITT: 22
+  Common files: 18
+  Identical: 18
+  Modified: 0
+  Only in current: 80
+  Only in ITT: 4
+======================================================================
