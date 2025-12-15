@@ -1,0 +1,175 @@
+================================================================================
+MANUSCRIPT FIGURE TO SCRIPT/NOTEBOOK MAPPING
+================================================================================
+
+This file provides a complete mapping between manuscript figures/tables and
+their corresponding R scripts or Jupyter notebooks in the analysis repository.
+
+================================================================================
+MAIN FIGURES
+================================================================================
+
+FIGURE 5: NC MONOCYTE ANALYSIS
+-------------------------------------------
+Figure 5a: Cell Type Annotation UMAP
+  → Script: Annotation/annotation.R
+
+Figure 5b: NC Monocyte Optimal Transport
+  → Notebook: NC_Monocyte_Optimal_Transport.ipynb
+
+Figure 5c: NC Monocyte Proportion Comparison
+  → Script: nc_monocytes_analysis.R
+
+Figure 5d: Chemotaxis Gene Expression UMAP
+  → Script: UMAP_comparisons.R
+
+Figure 5e: GSEA
+  → Script: NC_Monocytes_Analysis/GSEA/nextflow_run.sh
+
+Figure 5f: Chemokine Expression Violin Plots
+  → Script: nc_monocytes_analysis.R
+
+-------------------------------------------
+FIGURE 6: T CELL CLONAL EXPANSION & PATHWAY ANALYSIS
+-------------------------------------------
+Figure 6a: T Cell Subpopulation UMAP
+  → Script: Annotation/annotation.R
+
+Figure 6b: Pathway Activity Comparison
+  → Script: pathway_activity_comparison_new.R
+
+Figure 6c: Pathway Activity Comparison
+  → Script: pathway_activity_comparison_new.R
+
+Figure 6d: Clonal Expansion Analysis
+  → Script Pipeline (4 steps):
+     1. clonal_expansion_analysis_1.R (Step 1: Extract CDR3β sequences)
+     2. diversity_calculation_2.R (Step 2: Calculate diversity indices)
+     3. clonal_expansion_calculation_3.R (Step 3: Meta-analysis aggregation)
+     4. clonal_expansion_plots_4.R (Step 4: Generate final plots)
+
+-------------------------------------------
+FIGURE 7: T CELL CLONAL TRACKING & OPTIMAL TRANSPORT
+-------------------------------------------
+Figure 7a: Clonal Tracking Across CD8+ Subpopulations
+  → Script: track_t_cell_subpopulation_clones.R
+
+Figure 7b: T Cell Optimal Transport (Cluster-Level Arrows)
+  → Data Prep: Clonal_Tracking/final_nomenclature/coi/optimal_transport.R
+  → Analysis: Clonal_Tracking/final_nomenclature/coi/t_cell_optimal_transport.ipynb
+  → Output: Cluster-to-cluster arrows showing predicted cell fate transitions
+
+-------------------------------------------
+FIGURE 8: CENTRAL MEMORY CD8 ANALYSIS & CHECKPOINT EXPRESSION
+-------------------------------------------
+Figure 8a: T Cell Optimal Transport (Stacked Bar Charts)
+  → Data Prep: Clonal_Tracking/final_nomenclature/coi/optimal_transport.R
+  → Analysis: Clonal_Tracking/final_nomenclature/coi/t_cell_optimal_transport.ipynb
+  → Output: 7-row stacked bar charts showing target cluster distributions for each COI
+
+Figure 8b: Central Memory CD8 Optimal Transport
+  → Notebook: Clonal_Tracking/final_nomenclature/coi_central_memory_cd8/central_memory_cd8_t_cell_optimal_transport.ipynb
+  → Output: Focused optimal transport analysis for Central Memory CD8 (cluster 12) only
+
+Figure 8c: Immune Checkpoint Expression Comparison
+  → Script: immune_checkpoint_comparison.R
+  → Output: 21-page PDF with 2D density contours for checkpoint genes
+           (PDCD1, CD274, CTLA4, LAG3, HAVCR2, TIGIT, etc.)
+           3 panels per page: Pre, C1, C2 timepoints
+           Colored by cohort: Yellow=Control, Blue=ShortTerm, Red=LongTerm
+
+================================================================================
+SUPPLEMENTAL TABLES
+================================================================================
+
+Table S3: All Cells Cluster Proportions
+  → Script: cluster_proportion_comparison_new.R
+
+Table S4: T Cell Cluster Proportions
+  → Script: cluster_proportion_comparison_new.R
+
+================================================================================
+UTILITY SCRIPTS (NOT DIRECTLY GENERATING FIGURES)
+================================================================================
+
+get_metadata.R
+  → Purpose: Standardize timepoint nomenclature across all analyses
+  → Converts: S1→Pre/S, S2→C1, S3→C2, S4→C3, etc.
+  → Used by: Multiple downstream scripts requiring consistent metadata
+
+================================================================================
+ANALYSIS WORKFLOW OVERVIEW
+================================================================================
+
+1. CELL TYPE ANNOTATION
+   annotation.R → Figures 5a, 6a
+
+2. MONOCYTE ANALYSIS
+   cluster_proportion_comparison_new.R → Tables S3
+   NC_Monocyte_Optimal_Transport.ipynb → Figure 5b
+   nc_monocytes_analysis.R → Figures 5c, 5e, 5f
+   UMAP_comparisons.R → Figure 5d
+
+3. T CELL PATHWAY & CLONAL EXPANSION
+   pathway_activity_comparison_new.R → Figures 6b, 6c
+   Clonal expansion pipeline (4 scripts) → Figure 6d
+   cluster_proportion_comparison_new.R → Tables S4
+
+4. T CELL CLONAL TRACKING & OPTIMAL TRANSPORT
+   track_t_cell_subpopulation_clones.R → Figure 7a
+   optimal_transport.R + t_cell_optimal_transport.ipynb → Figures 7b, 8a
+   central_memory_cd8_t_cell_optimal_transport.ipynb → Figure 8b
+
+5. IMMUNE CHECKPOINT ANALYSIS
+   immune_checkpoint_comparison.R → Figure 8c
+
+================================================================================
+KEY TECHNICAL NOTES
+================================================================================
+
+• All UMAP embeddings: Pre-computed in Seurat objects
+• Optimal transport: Uses Python Optimal Transport (POT) library, EMD algorithm
+• Statistical tests: Wilcoxon rank-sum, edgeR for differential expression
+• Clonal calling: CDR3β amino acid sequences as clone identifiers
+• Downsampling: Applied where needed to prevent timepoint/patient bias
+• Visualization: Seurat + ggplot2 (R), matplotlib + seaborn (Python)
+
+================================================================================
+DATA DEPENDENCIES
+================================================================================
+
+Primary Seurat Objects:
+  • MK_Seurat_Obj.RDS (all cell types)
+  • MK_T_Cells_seurat_obj.RDS (CD4+/CD8+ T cells only)
+  • MK_NC_monocytes_seurat.rds (NC monocytes only)
+
+Metadata Files:
+  • patient_survival_data.csv (cohort assignments, OS data)
+  • clone_cell_barcode_csvs/*.csv (TCR clonotype mappings)
+
+Pathway Databases:
+  • Reactome pathways (GSEA analysis)
+  • GO terms (biological process enrichment)
+
+================================================================================
+REPRODUCIBILITY INFORMATION
+================================================================================
+
+Random Seeds:
+  • R scripts: set.seed(123) where sampling is performed
+  • Python notebooks: np.random.seed(42) for consistency
+
+Software Versions:
+  • Seurat: v4.x (R single-cell analysis)
+  • POT: Python Optimal Transport library
+  • edgeR: Differential expression analysis
+  • ggplot2: Visualization framework
+
+Computing Environment:
+  • High-performance computing cluster
+  • Batch job submission for memory-intensive analyses
+  • Interactive analysis in RStudio/Jupyter
+
+================================================================================
+LAST UPDATED: 2025-12-15
+================================================================================
