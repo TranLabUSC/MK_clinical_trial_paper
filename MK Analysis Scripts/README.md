@@ -1,7 +1,257 @@
 # MK Analysis Scripts - Single-Cell RNA-seq Analysis
 
 ## Overview
-This repository contains R scripts for analyzing single-cell RNA-sequencing data from glioblastoma (GBM) patients, focusing on T cell populations, clonal expansion, and immune dynamics.
+This repository contains R scripts and Jupyter notebooks for analyzing single-cell RNA-sequencing (scRNA-seq) data from glioblastoma (GBM) patients treated with anti-PD-1 checkpoint blockade therapy (MK-3475) combined with MLA. The analysis focuses on T cell populations, clonal expansion, immune checkpoint expression, and optimal transport-based cell fate modeling.
+
+---
+
+## System Requirements
+
+### Software Dependencies
+
+**Required Software:**
+- **R** (version ≥ 4.1.0, tested on 4.1.0, 4.2.0, 4.3.0)
+- **Python** (version ≥ 3.8, tested on 3.8, 3.9, 3.10)
+- **RStudio** (recommended, version ≥ 2021.09.0)
+- **Jupyter Notebook** or **JupyterLab** (for .ipynb files)
+
+**R Packages (with tested versions):**
+- Seurat (≥ 4.0.0, tested on 4.3.0) - Single-cell analysis framework
+- dplyr (≥ 1.0.0) - Data manipulation
+- ggplot2 (≥ 3.3.0) - Visualization
+- cowplot (≥ 1.1.0) - Multi-panel plots
+- edgeR (≥ 3.36.0) - Differential expression
+- pheatmap (≥ 1.0.12) - Heatmap generation
+- survival (≥ 3.2-13) - Cox regression analysis
+- tidyr (≥ 1.1.0) - Data tidying
+
+**Python Packages (with tested versions):**
+- scanpy (≥ 1.8.0) - Single-cell analysis
+- anndata (≥ 0.8.0) - Annotated data matrices
+- numpy (≥ 1.21.0) - Numerical computing
+- pandas (≥ 1.3.0) - Data manipulation
+- matplotlib (≥ 3.4.0) - Plotting
+- seaborn (≥ 0.11.0) - Statistical visualization
+- POT (Python Optimal Transport, ≥ 0.8.0) - Optimal transport algorithms
+
+### Operating System
+- **Tested on:** Linux (Ubuntu 20.04, 22.04), macOS (10.15+, Big Sur, Monterey)
+- **Compatible with:** Windows 10/11 (via WSL2 recommended for best performance)
+
+### Hardware Requirements
+- **Minimum:** 16 GB RAM, 4-core CPU, 50 GB free disk space
+- **Recommended:** 32+ GB RAM, 8+ core CPU, 100+ GB free disk space
+- **Note:** Some analyses (e.g., optimal transport on large cell populations) are memory-intensive and benefit from high-RAM systems
+
+### Non-Standard Hardware
+None required. All analyses run on standard desktop/laptop computers or HPC clusters.
+
+---
+
+## Installation Guide
+
+### R Package Installation
+
+**Estimated install time:** 15-30 minutes on a standard desktop computer with good internet connection.
+
+```r
+# Install CRAN packages
+install.packages(c("dplyr", "ggplot2", "cowplot", "pheatmap", "survival", "tidyr"))
+
+# Install Bioconductor packages
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install(c("Seurat", "edgeR"))
+```
+
+### Python Package Installation
+
+**Estimated install time:** 10-20 minutes on a standard desktop computer.
+
+```bash
+# Create conda environment (recommended)
+conda create -n mk_analysis python=3.9
+conda activate mk_analysis
+
+# Install packages via conda (faster, handles dependencies better)
+conda install -c conda-forge scanpy anndata numpy pandas matplotlib seaborn
+pip install POT
+
+# Alternative: Install via pip
+pip install scanpy anndata numpy pandas matplotlib seaborn POT
+```
+
+### Repository Setup
+
+```bash
+# Clone repository
+git clone https://github.com/TranLabUSC/MK_clinical_trial_paper.git
+cd MK_clinical_trial_paper
+
+# Verify installation
+Rscript -e "library(Seurat); library(dplyr); library(ggplot2)"
+python -c "import scanpy; import anndata; import ot; print('All Python packages installed')"
+```
+
+**Total installation time:** ~30-50 minutes (dependent on internet speed and system specs)
+
+---
+
+## Data Availability
+
+### Required Input Data
+
+All analysis scripts require the following data files, which are available from the European Genome-phenome Archive (EGA):
+
+**Primary Seurat Objects (RDS files):**
+- `MK_Cells_seurat_obj.RDS` - All cell types (immune and non-immune populations)
+- `MK_T_Cells_seurat_obj.RDS` - CD4+ and CD8+ T cell subpopulations only
+- `MK_NC_monocytes_seurat.rds` - Non-Classical monocytes subset
+
+**TCR Clonotype Data (CSV files):**
+- `filtered_contig_annotations.csv` - VDJ sequencing data (cell barcode to CDR3β mapping)
+- `clonotype_df_proportion_*.csv` - Clone proportion tables per T cell subtype
+- `clonotype_df_absolute_*.csv` - Absolute clone count tables
+
+**Clinical Metadata:**
+- `patient_survival_data.csv` - Patient cohort assignments, survival outcomes, treatment arms
+
+**Additional Reference Files:**
+- `T_Cell_cluster_colors.csv` - Cluster color mapping for consistent visualization
+- `subsubset_output.gmt` - Gene sets for pathway analysis (GMT format)
+
+### EGA Repository Access
+
+**Repository:** European Genome-phenome Archive (EGA)
+**Study Accession:** [Will be provided upon manuscript acceptance]
+**Reviewer Access Link:** [Provided to reviewers via editorial system]
+
+**Data Download Instructions:**
+1. Request access via EGA portal using reviewer credentials
+2. Download all files to a local directory
+3. Update file paths in scripts to point to your local data directory
+4. See "Instructions for Use" section below for path configuration
+
+---
+
+
+## Instructions for Use
+
+### General Workflow
+
+1. **Configure Data Paths:**
+   - Update file paths in each script to point to your local data directory
+   - Example: Change `/project/dtran642_927/Data/...` to your local path
+
+2. **Select Analysis of Interest:**
+   - See "Documented Scripts" section below for full list
+   - See `FIGURE_TO_SCRIPT_MAPPING.txt` for figure-to-script correspondence
+
+3. **Run Scripts in Dependency Order:**
+   - Some scripts depend on outputs from others
+   - Follow pipeline order for multi-step analyses (e.g., clonal expansion: steps 1→2→3→4)
+
+### Example: Running Clonal Expansion Analysis Pipeline
+
+```r
+# Step 1: Prepare clonotype tables
+source("clonal_expansion_analysis_1.R")
+
+# Step 2: Calculate diversity indices
+source("diversity_calculation_2.R")
+
+# Step 3: Calculate expansion metrics
+source("clonal_expansion_calculation_3.R")
+
+# Step 4: Generate visualization (Figure 6d)
+source("clonal_expansion_plots_4.R")
+```
+
+### Example: Running Optimal Transport Analysis
+
+```bash
+# Step 1: Prepare data in R
+Rscript Clonal_Tracking/final_nomenclature/coi/optimal_transport.R
+
+# Step 2: Run optimal transport in Python/Jupyter
+jupyter notebook Clonal_Tracking/final_nomenclature/coi/t_cell_optimal_transport.ipynb
+# Execute all cells to generate Figures 7b and 8a
+```
+
+### Path Configuration
+
+**Update paths in script headers:**
+```r
+# Example configuration in each script
+base_dir <- "/path/to/your/data/"
+seurat_obj_path <- paste0(base_dir, "MK_T_Cells_seurat_obj.RDS")
+survival_data_path <- paste0(base_dir, "patient_survival_data.csv")
+output_dir <- "/path/to/your/output/"
+```
+
+---
+
+## Reproduction of Manuscript Results
+
+### Complete Figure Reproduction
+
+**IMPORTANT:** Full reproduction requires access to complete dataset from EGA repository.
+
+**Approximate Total Runtime:** 10-15 hours on a high-performance workstation (16-core, 64 GB RAM)
+
+**Recommended Execution Order:**
+
+1. **Cell Type Annotation** (30 min)
+   - `Annotation/annotation.R` → Figures 5a, 6a
+
+2. **Monocyte Analysis** (2-3 hours)
+   - `NC_Monocyte_Optimal_Transport.ipynb` → Figure 5b
+   - `nc_monocytes_analysis.R` → Figures 5c, 5e, 5f
+   - `UMAP_comparisons.R` → Figure 5d
+
+3. **T Cell Pathway & Clonal Expansion** (3-4 hours)
+   - `pathway_activity_comparison_new.R` → Figures 6b, 6c
+   - Clonal expansion pipeline (steps 1-4) → Figure 6d
+   - `cluster_proportion_comparison_new.R` → Tables S3, S4
+
+4. **Clonal Tracking & Optimal Transport** (4-5 hours)
+   - `track_t_cell_subpopulation_clones.R` → Figure 7a
+   - `optimal_transport.R` + `t_cell_optimal_transport.ipynb` → Figures 7b, 8a
+   - `central_memory_cd8_t_cell_optimal_transport.ipynb` → Figure 8b
+
+5. **Immune Checkpoint Analysis** (1-2 hours)
+   - `immune_checkpoint_comparison.R` → Figure 8c
+
+**Output Verification:**
+- Compare generated figures with manuscript figures
+- Verify statistical values match reported results
+- Check supplemental tables for consistency
+
+**Troubleshooting:**
+- If memory errors occur, reduce downsampling parameters
+- For slow optimal transport, reduce max_iterations or use fewer timepoints
+- Ensure all dependencies are correctly installed with compatible versions
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Citation
+
+If you use this code, please cite:
+
+[Citation information to be added upon manuscript publication]
+
+---
+
+## Contact
+
+For questions or issues:
+- **GitHub Issues:** https://github.com/TranLabUSC/MK_clinical_trial_paper/issues
+- **Email:** [Corresponding author email]
 
 ---
 
