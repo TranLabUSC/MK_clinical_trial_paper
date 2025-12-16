@@ -102,24 +102,26 @@ python -c "import scanpy; import anndata; import ot; print('All Python packages 
 
 ### Required Input Data
 
-All analysis scripts require the following data files, which are available from the European Genome-phenome Archive (EGA):
+**Primary Data from EGA Repository:**
 
-**Primary Seurat Objects (RDS files):**
-- `MK_Cells_seurat_obj.RDS` - All cell types (immune and non-immune populations)
-- `MK_T_Cells_seurat_obj.RDS` - CD4+ and CD8+ T cell subpopulations only
-- `MK_NC_monocytes_seurat.rds` - Non-Classical monocytes subset
+The following core datasets are available from the European Genome-phenome Archive (EGA):
 
-**TCR Clonotype Data (CSV files):**
-- `filtered_contig_annotations.csv` - VDJ sequencing data (cell barcode to CDR3β mapping)
-- `clonotype_df_proportion_*.csv` - Clone proportion tables per T cell subtype
-- `clonotype_df_absolute_*.csv` - Absolute clone count tables
+1. **Primary Seurat Object (RDS file):**
+   - `MK_Cells_seurat_obj.RDS` - Complete dataset containing all cell types (immune and non-immune populations)
+   - **Note:** Cell type-specific objects (`MK_T_Cells_seurat_obj.RDS`, `MK_NC_monocytes_seurat.rds`) can be derived from this master object using the annotation scripts provided in this repository
 
-**Clinical Metadata:**
-- `patient_survival_data.csv` - Patient cohort assignments, survival outcomes, treatment arms
+2. **TCR VDJ Sequencing Data (CSV file):**
+   - `filtered_contig_annotations.csv` - Raw VDJ sequencing data (cell barcode to CDR3β amino acid sequence mapping)
+   - **Note:** Processed clonotype files (`clonotype_df_proportion_*.csv`, `clonotype_df_absolute_*.csv`) are generated from this raw data using `clonal_expansion_analysis_1.R`
+
+3. **Clinical Metadata (CSV file):**
+   - `patient_survival_data.csv` - Patient cohort assignments, survival outcomes, treatment arms, and clinical variables
 
 **Additional Reference Files:**
-- `T_Cell_cluster_colors.csv` - Cluster color mapping for consistent visualization
+
+The following pathway database file is required for pathway enrichment analyses:
 - `subsubset_output.gmt` - Gene sets for pathway analysis (GMT format)
+- Alternative: Download current GMT files from MSigDB (http://www.gsea-msigdb.org/gsea/msigdb/)
 
 ### EGA Repository Access
 
