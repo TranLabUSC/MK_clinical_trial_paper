@@ -1,7 +1,17 @@
 # MK Analysis Scripts - Single-Cell RNA-seq Analysis
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18330074.svg)](https://doi.org/10.5281/zenodo.18330074)
+
 ## Overview
 This repository contains R scripts and Jupyter notebooks for analyzing single-cell RNA-sequencing (scRNA-seq) data from glioblastoma (GBM) patients treated with anti-PD-1 checkpoint blockade therapy (MK-3475) combined with MLA. The analysis focuses on T cell populations, clonal expansion, immune checkpoint expression, and optimal transport-based cell fate modeling.
+
+### 📊 Analysis Workflow Overview
+For a comprehensive overview of the entire analysis pipeline, including trial design, data processing, and figure generation workflow, see **[ANALYSIS_WORKFLOW.md](ANALYSIS_WORKFLOW.md)**. This document provides:
+- Visual flowcharts of the computational pipeline
+- Step-by-step analysis phases
+- Figure-to-script mapping
+- Data flow diagrams
+- Quick navigation guide
 
 ---
 
@@ -243,9 +253,27 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Citation
 
-If you use this code, please cite:
+If you use this code in your research, please cite both the code repository and the manuscript:
 
-[Citation information to be added upon manuscript publication]
+**Code Repository:**
+Tran, D.D. et al. (2026). MK Analysis Scripts - Single-Cell RNA-seq Analysis Code (Version 0.1.0). Zenodo. https://doi.org/10.5281/zenodo.18330074
+
+**Manuscript:**
+[Full manuscript citation will be added upon publication in Nature Communications]
+
+**BibTeX for Code:**
+```bibtex
+@software{tran2026mk,
+  author       = {Tran, D.D. and others},
+  title        = {MK Analysis Scripts - Single-Cell RNA-seq Analysis Code},
+  month        = jan,
+  year         = 2026,
+  publisher    = {Zenodo},
+  version      = {0.1.0},
+  doi          = {10.5281/zenodo.18330074},
+  url          = {https://doi.org/10.5281/zenodo.18330074}
+}
+```
 
 ---
 
